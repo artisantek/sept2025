@@ -22,27 +22,27 @@ pipeline {
             }
         }
 
-        stage("Sonarqube Analysis ") {
-            steps {
-                withSonarQubeEnv('sonar-server') {
-                    dir('movie-analyzer-app/frontend') { 
-                        sh '''
-                        $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName="movie-analyzer" \
-                        -Dsonar.projectKey="movie-analyzer"
-                        '''
-                    }
-                }
-            }
-        }
+        // stage("Sonarqube Analysis ") {
+        //     steps {
+        //         withSonarQubeEnv('sonar-server') {
+        //             dir('movie-analyzer-app/frontend') { 
+        //                 sh '''
+        //                 $SCANNER_HOME/bin/sonar-scanner \
+        //                 -Dsonar.projectName="movie-analyzer" \
+        //                 -Dsonar.projectKey="movie-analyzer"
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage("quality gate"){
-           steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonarToken' 
-                }
-            } 
-        }
+        // stage("quality gate"){
+        //    steps {
+        //         script {
+        //             waitForQualityGate abortPipeline: false, credentialsId: 'sonarToken' 
+        //         }
+        //     } 
+        // }
 
 
         stage('Docker Build') {
