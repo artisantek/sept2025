@@ -49,21 +49,21 @@ pipeline {
             parallel {
                 stage('Build Backend') {
                     steps {
-                        dir('movie-analyzer-app/backend') {
+                        dir('backend') {
                             dockerImageBuild('$backendImage', '$dockerTag')
                         }
                     }
                 }
                 stage('Build Frontend') {
                     steps {
-                        dir('movie-analyzer-app/frontend') {
+                        dir('frontend') {
                             dockerImageBuild('$frontendImage', '$dockerTag')
                         }
                     }
                 }
                 stage('Build Model') {
                     steps {
-                        dir('movie-analyzer-app/model') {
+                        dir('model') {
                             dockerImageBuild('$modelImage', '$dockerTag')
                         }
                     }
