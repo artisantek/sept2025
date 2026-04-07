@@ -1,0 +1,28 @@
+# STAGING Environment Configuration
+# Backend configuration
+backend:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+
+  env:
+    DB_NAME: "moviereviews_staging"
+
+# Frontend configuration
+frontend:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+
+# Model server configuration
+model:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+
+# Ingress configuration
+ingress:
+  host: staging-movie.sskdevops.in

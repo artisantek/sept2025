@@ -1,0 +1,136 @@
+# Backend configuration
+backend:
+  name: backend
+  replicaCount: 1
+  
+  image:
+    repository: __BACKEND_IMAGE_REPOSITORY__
+    tag: __BACKEND_IMAGE_TAG__
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+  
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  
+  env:
+    # DB_HOST should be your RDS endpoint (e.g., movie-db.xxxxx.us-east-1.rds.amazonaws.com)
+    DB_HOST: "moviereviews-instance.ch8ccua4umia.ap-south-1.rds.amazonaws.com"
+    DB_PORT: "5432"
+    DB_NAME: "moviereviews"
+    MODEL_SERVER_URL: "http://model:5000"
+    SERVER_PORT: "8080"
+  
+  probes:
+    readiness:
+      path: /actuator/health
+      port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    liveness:
+      path: /actuator/health
+      port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 10
+  
+  secret:
+    # Base64 encoded values for RDS database credentials
+    # Update these with your actual RDS username and password
+    DB_USERNAME: bW92aWV1c2Vy  # movieuser (base64)
+    DB_PASSWORD: bW92aWVwYXNz  # moviepass (base64)
+
+# Frontend configuration
+frontend:
+  name: frontend
+  replicaCount: 1
+  
+  image:
+    repository: __FRONTEND_IMAGE_REPOSITORY__
+    tag: __FRONTEND_IMAGE_TAG__
+    pullPolicy: Always
+  
+  service:
+    port: 3000
+    targetPort: 3000
+  
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  env:
+    BACKEND_API_URL: "http://backend:8080"
+  
+  probes:
+    readiness:
+      path: /health
+      port: 3000
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    liveness:
+      path: /health
+      port: 3000
+      initialDelaySeconds: 10
+      periodSeconds: 10
+
+# Model server configuration
+model:
+  name: model
+  replicaCount: 1
+  
+  image:
+    repository: __MODEL_IMAGE_REPOSITORY__
+    tag: __MODEL_IMAGE_TAG__
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 5000
+    targetPort: 5000
+  
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  env:
+    MODEL_PORT: "5000"
+  
+  probes:
+    readiness:
+      path: /health
+      port: 5000
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    liveness:
+      path: /health
+      port: 5000
+      initialDelaySeconds: 10
+      periodSeconds: 10
+
+# Ingress configuration - AWS ALB
+ingress:
+  enabled: true
+  host: movie.sskdevops.in
+  
+  # ALB configuration
+  alb:
+    scheme: internet-facing
+    targetType: ip
+    certificateArn: arn:aws:acm:ap-south-1:070797855002:certificate/1b1ab1c4-6df7-402d-8a81-a2d700fd50ee
+    groupName: shared-alb
+    groupOrder: '10'

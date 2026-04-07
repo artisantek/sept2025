@@ -1,0 +1,27 @@
+# PRODUCTION Environment Configuration
+# Backend configuration
+backend:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+
+  env:
+    DB_NAME: "moviereviews"
+
+frontend:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+
+# Model server configuration
+model:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+
+# Ingress configuration
+ingress:
+  host: movie.sskdevops.in
