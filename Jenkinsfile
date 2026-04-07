@@ -22,27 +22,27 @@ pipeline {
             }
         }
 
-        // stage("Sonarqube Analysis ") {
-        //     steps {
-        //         withSonarQubeEnv('sonar-server') {
-        //             dir('movie-analyzer-app/frontend') { 
-        //                 sh '''
-        //                 $SCANNER_HOME/bin/sonar-scanner \
-        //                 -Dsonar.projectName="movie-analyzer" \
-        //                 -Dsonar.projectKey="movie-analyzer"
-        //                 '''
-        //             }
-        //         }
-        //     }
-        // }
+        stage("Sonarqube Analysis ") {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    dir('movie-analyzer-app/frontend') { 
+                        sh '''
+                        /opt/sonar/bin/sonar-scanner \
+                        -Dsonar.projectName="movie-analyzer" \
+                        -Dsonar.projectKey="movie-analyzer"
+                        '''
+                    }
+                }
+            }
+        }
 
-        // stage("quality gate"){
-        //    steps {
-        //         script {
-        //             waitForQualityGate abortPipeline: false, credentialsId: 'sonarToken' 
-        //         }
-        //     } 
-        // }
+        stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonarToken' 
+                }
+            } 
+        }
 
 
         stage('Docker Build') {
@@ -71,45 +71,45 @@ pipeline {
             }
         }
 
-        stage('Security Scans') {
-            parallel {
-                stage('Snyk Scan Backend') {
-                    steps {
-                        snykImageScan('$backendImage', '$dockerTag', 'snykCred', '$snykOrg')
-                    }
-                }
-                stage('Snyk Scan Frontend') {
-                    steps {
-                        snykImageScan('$frontendImage', '$dockerTag', 'snykCred', '$snykOrg')
-                    }
-                }
-                stage('Snyk Scan Model') {
-                    steps {
-                        snykImageScan('$modelImage', '$dockerTag', 'snykCred', '$snykOrg')
-                    }
-                }
-            }
-        }
+        // stage('Security Scans') {
+        //     parallel {
+        //         stage('Snyk Scan Backend') {
+        //             steps {
+        //                 snykImageScan('$backendImage', '$dockerTag', 'snykCred', '$snykOrg')
+        //             }
+        //         }
+        //         stage('Snyk Scan Frontend') {
+        //             steps {
+        //                 snykImageScan('$frontendImage', '$dockerTag', 'snykCred', '$snykOrg')
+        //             }
+        //         }
+        //         stage('Snyk Scan Model') {
+        //             steps {
+        //                 snykImageScan('$modelImage', '$dockerTag', 'snykCred', '$snykOrg')
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Trivy Scans') {
-            parallel {
-                stage('Trivy Scan Backend') {
-                    steps {
-                        sh "trivy image -f json -o backend-results-${BUILD_NUMBER}.json ${backendImage}:${dockerTag}"
-                    }
-                }
-                stage('Trivy Scan Frontend') {
-                    steps {
-                        sh "trivy image -f json -o frontend-results-${BUILD_NUMBER}.json ${frontendImage}:${dockerTag}"
-                    }
-                }
-                stage('Trivy Scan Model') {
-                    steps {
-                        sh "trivy image -f json -o model-results-${BUILD_NUMBER}.json ${modelImage}:${dockerTag}"
-                    }
-                }
-            }
-        }
+        // stage('Trivy Scans') {
+        //     parallel {
+        //         stage('Trivy Scan Backend') {
+        //             steps {
+        //                 sh "trivy image -f json -o backend-results-${BUILD_NUMBER}.json ${backendImage}:${dockerTag}"
+        //             }
+        //         }
+        //         stage('Trivy Scan Frontend') {
+        //             steps {
+        //                 sh "trivy image -f json -o frontend-results-${BUILD_NUMBER}.json ${frontendImage}:${dockerTag}"
+        //             }
+        //         }
+        //         stage('Trivy Scan Model') {
+        //             steps {
+        //                 sh "trivy image -f json -o model-results-${BUILD_NUMBER}.json ${modelImage}:${dockerTag}"
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Docker Push') {
             parallel {
