@@ -1,0 +1,46 @@
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.frontend.name }}
+  labels:
+    app: {{ .Values.frontend.name }}
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.frontend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.frontend.name }}
+    spec:
+      containers:
+      - name: {{ .Values.frontend.name }}
+        image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
+        imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.frontend.service.targetPort }}
+        env:
+        - name: BACKEND_API_URL
+          value: {{ .Values.frontend.env.BACKEND_API_URL | quote }}
+        resources:
+          requests:
+            memory: {{ .Values.frontend.resources.requests.memory }}
+            cpu: {{ .Values.frontend.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.frontend.resources.limits.memory }}
+            cpu: {{ .Values.frontend.resources.limits.cpu }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.frontend.probes.readiness.path }}
+            port: {{ .Values.frontend.probes.readiness.port }}
+          initialDelaySeconds: {{ .Values.frontend.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.frontend.probes.readiness.periodSeconds }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.frontend.probes.liveness.path }}
+            port: {{ .Values.frontend.probes.liveness.port }}
+          initialDelaySeconds: {{ .Values.frontend.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.frontend.probes.liveness.periodSeconds }} 
