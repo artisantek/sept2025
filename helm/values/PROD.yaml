@@ -24,4 +24,4 @@ model:
 
 # Ingress configuration
 ingress:
-  host: movie.artisantek.in
+  host: movie.sskdevops.in

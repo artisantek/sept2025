@@ -25,4 +25,4 @@ model:
 
 # Ingress configuration
 ingress:
-  host: staging-movie.artisantek.in
+  host: staging-movie.sskdevops.in
